@@ -167,3 +167,5 @@
 (advice-add 'org-self-insert-command :before-until #'modi/org-insert-org-entity-maybe)
 
 (add-hook 'write-file-hooks 'delete-trailing-whitespace)
+
+(global-set-key "\C-x\C-b" 'buffer-menu)
