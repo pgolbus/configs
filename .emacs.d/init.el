@@ -175,6 +175,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(magit-status-sections-hook
+   (quote
+    (magit-insert-status-headers magit-insert-merge-log magit-insert-rebase-sequence magit-insert-am-sequence magit-insert-sequencer-sequence magit-insert-bisect-output magit-insert-bisect-rest magit-insert-bisect-log magit-insert-staged-changes magit-insert-unstaged-changes magit-insert-stashes magit-insert-untracked-files magit-insert-unpushed-to-pushremote magit-insert-unpushed-to-upstream-or-recent magit-insert-unpulled-from-pushremote magit-insert-unpulled-from-upstream)))
  '(package-selected-packages (quote (magit))))
 
 (custom-set-faces
@@ -208,3 +211,12 @@
 (defun devtops (path)
   (interactive "sPath: ")
   (open-remote "bigdatatop01.dev.bo1.csnzoo.com" path))
+
+(setq visible-bell 1)
+
+(defun move-bottom-window-right ()
+  (interactive)
+  (let ((buffers (mapcar 'window-buffer (window-list))))
+    (when (= 2 (length buffers))
+      (delete-other-windows)
+      (set-window-buffer (split-window-horizontally) (cadr buffers)))))
