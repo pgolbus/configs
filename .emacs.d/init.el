@@ -169,3 +169,42 @@
 (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
 (global-set-key "\C-x\C-b" 'buffer-menu)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages (quote (magit))))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(defun swap-windows () "Put the buffer from the selected window in next window, and vice versa"
+  (interactive)
+  (let* ((this (selected-window))
+     (other (next-window))
+     (this-buffer (window-buffer this))
+     (other-buffer (window-buffer other)))
+    (set-window-buffer other this-buffer)
+    (set-window-buffer this other-buffer)
+    )
+  )
+
+(defun open-remote (server path)
+  (interactive "sServer: \nsPath: ")
+  (pcase path
+    ("" (find-file (format "/ssh:%s:~" server)))
+    (_ (find-file (format "/ssh:%s:%s" server path)))))
+
+(defun datasci (path)
+  (interactive "sPath: ")
+  (open-remote "datasci12.dev.bo1.csnzoo.com" path))
+
+(defun devtops (path)
+  (interactive "sPath: ")
+  (open-remote "bigdatatio01.dev.bo1.csnzoo.com" path))
