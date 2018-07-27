@@ -207,4 +207,4 @@
 
 (defun devtops (path)
   (interactive "sPath: ")
-  (open-remote "bigdatatio01.dev.bo1.csnzoo.com" path))
+  (open-remote "bigdatatop01.dev.bo1.csnzoo.com" path))
