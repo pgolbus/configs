@@ -212,7 +212,7 @@
   (interactive "sPath: ")
   (open-remote "bigdatatop01.dev.bo1.csnzoo.com" path))
 
-(setq visible-bell 1)
+(setq ring-bell-function 'ignore)
 
 (defun move-bottom-window-right ()
   (interactive)
