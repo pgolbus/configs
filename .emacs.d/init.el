@@ -30,7 +30,7 @@
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 ;; The above is the default in recent emacsen
 
-(set-default-font "Menlo 18")
+(set-default-font "sf mono 22")
 
 (column-number-mode)
 
