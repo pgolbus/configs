@@ -1,4 +1,3 @@
-
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -26,11 +25,28 @@
 ;;;;Org mode configuration
 ;; Enable Org mode
 (require 'org)
-;; Make Org mode work with files ending in .org
+;; Make Org mode work with files ending in .org / .org.txt
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+(add-to-list 'auto-mode-alist '("\\.org\\." . org-mode))
+(setq org-todo-keywords
+      '((sequence "IN PROGRESS" "IN REVIEW" "|" "DELEGATED" "DONE")))
 ;; The above is the default in recent emacsen
+(eval-after-load "org"
+  '(require 'ox-md nil t))
+;; I want my underscores, not subscripts
+(setq org-export-with-sub-superscripts nil)
+;; nor do I want a table of contents
+(setq org-export-with-toc nil)
+(setq org-ellipsis "▼")
 
-(set-default-font "monaco 20")
+(add-hook 'org-mode-hook 'org-indent-mode)
+(add-hook 'org-mode-hook 'visual-line-mode)
+
+(setq markdown-command "/usr/local/bin/pandoc")
+
+(set-default-font "SF Mono 24")
+
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 (column-number-mode)
 
@@ -113,8 +129,6 @@
 ;; Make Org mode work with files ending in .org
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 ;; The above is the default in recent emacsen
-
-(set-default-font "Menlo 18")
 
 (column-number-mode)
 
@@ -169,6 +183,7 @@
 (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
 (global-set-key "\C-x\C-b" 'buffer-menu)
+(global-set-key "\C-cg" 'magit-status)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -178,7 +193,11 @@
  '(magit-status-sections-hook
    (quote
     (magit-insert-status-headers magit-insert-merge-log magit-insert-rebase-sequence magit-insert-am-sequence magit-insert-sequencer-sequence magit-insert-bisect-output magit-insert-bisect-rest magit-insert-bisect-log magit-insert-staged-changes magit-insert-unstaged-changes magit-insert-stashes magit-insert-untracked-files magit-insert-unpushed-to-pushremote magit-insert-unpushed-to-upstream-or-recent magit-insert-unpulled-from-pushremote magit-insert-unpulled-from-upstream)))
- '(package-selected-packages (quote (ein-mumamo ein magit))))
+ '(org-export-backends (quote (ascii html icalendar latex md odt)))
+ '(package-selected-packages
+   (quote
+    (multi-term ssh yaml-mode evil-tutor exec-path-from-shell jedi sudo-edit flymd markdown-mode virtualenvwrapper pyenv-mode pyenv-mode-auto elpy blacken ein-mumamo ein magit)))
+ '(reb-re-syntax (quote string)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -198,6 +217,42 @@
     )
   )
 
+(require 'virtualenvwrapper)
+(venv-initialize-interactive-shells) ;; if you want interactive shell support
+(venv-initialize-eshell) ;; if you want eshell support
+
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-separator "/")
+(setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
+(setq uniquify-ignore-buffers-re "^\\*") ; don't muck with special buffers
+
+(require 'multi-term)
+(setq multi-term-program "/bin/zsh")
+
+(defun ssh-to-host (host)
+  (interactive "sHostname: ")
+  (multi-term)
+  (term-send-raw-string (format "ssh %s\n" host))
+;  (term-send-raw-string "gohome\n")
+;  (term-send-raw-string "source .zshrc\n")
+  (term-send-raw-string "clear\n")
+  (rename-buffer host "unique"))
+
+(defun screen-to-host (host screen &optional flags)
+  (interactive "sHostname: \nsScreen: ")
+  (ssh-to-host host)
+  (if (not flags)
+    (term-send-raw-string (format "screen -S %s\n" screen))
+    (term-send-raw-string (format "screen -%s %s\n" flags screen)))
+  (rename-buffer (format "%s:%s" screen host) "unique"))
+(global-set-key (kbd "C-c t") 'screen-to-host)
+
+(defun rescreen-to-host (host screen)
+  (interactive "sHostname: \nsScreen: ")
+  (screen-to-host host screen "r"))
+(global-set-key (kbd "C-c r") 'rescreen-to-host)
+
 (defun open-remote (server path)
   (interactive "sServer: \nsPath: ")
   (pcase path
@@ -206,11 +261,18 @@
 
 (defun datasci (path)
   (interactive "sPath: ")
-  (open-remote "datasci12.dev.bo1.csnzoo.com" path))
+  (save-excursion
+    (open-remote "datasci12.dev.bo1.csnzoo.com" path)))
 
 (defun devtops (path)
   (interactive "sPath: ")
-  (open-remote "bigdatatop01.dev.bo1.csnzoo.com" path))
+  (save-excursion
+    (open-remote "bigdatatop01.dev.bo1.csnzoo.com" path)))
+
+(defun gpu2 (path)
+  (interactive "sPath: ")
+  (save-excursion
+    (open-remote "gputop02.host.bo1.csnzoo.com" path)))
 
 (setq ring-bell-function 'ignore)
 
@@ -222,3 +284,10 @@
       (set-window-buffer (split-window-horizontally) (cadr buffers)))))
 
 (global-linum-mode)
+
+(defun sort-lines-i ()
+  (interactive)
+  (let ((sort-fold-case t))
+    (call-interactively 'sort-lines)))
+
+(exec-path-from-shell-initialize)
